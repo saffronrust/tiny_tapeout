@@ -5,7 +5,7 @@ from cocotb.triggers import RisingEdge, Timer
 @cocotb.test()
 async def test_systolic_array(dut):
     """Verify 2x2 matrix multiplication: [[1,2],[3,4]] * [[5,6],[7,8]]"""
-    clock = Clock(dut.clk, 10, units="ns")
+    clock = Clock(dut.clk, 10, unit="ns")
     cocotb.start_soon(clock.start())
 
     # Reset
@@ -35,21 +35,23 @@ async def test_systolic_array(dut):
     # Tick 4: a_row0 = 3, a_row1 = 2 -> Read c00 = 19
     dut.ui_in.value = (2 << 4) | 3
     await RisingEdge(dut.clk)
+    await Timer(1, unit="ns")  # Wait for registers to update
     assert int(dut.uo_out.value) == 19, f"Expected 19, got {int(dut.uo_out.value)}"
 
     # Tick 5: a_row0 = 0, a_row1 = 4 -> Read c10 = 43, then c01 = 22
     dut.ui_in.value = (4 << 4) | 0
     await RisingEdge(dut.clk)
+    await Timer(1, unit="ns")  # Wait for registers to update
     assert int(dut.uo_out.value) == 43, f"Expected 43, got {int(dut.uo_out.value)}"
 
     dut.uio_in.value = 0x2  # col_select = 1
-    await Timer(1, units="ns")
+    await Timer(1, unit="ns")  # Wait for mux to switch
     assert int(dut.uo_out.value) == 22, f"Expected 22, got {int(dut.uo_out.value)}"
 
     # Tick 6: Flush -> Read c11 = 50
     dut.ui_in.value = 0
     await RisingEdge(dut.clk)
-    await Timer(1, units="ns")
+    await Timer(1, unit="ns")  # Wait for registers to update
     assert int(dut.uo_out.value) == 50, f"Expected 50, got {int(dut.uo_out.value)}"
 
     dut._log.info("SUCCESS: All 4 matrix outputs (19, 43, 22, 50) verified!")
