@@ -1,7 +1,7 @@
 # Tiny Tapeout project information
 project:
   title:        "2x2 INT4 Systolic Array"
-  author:       "Your Name"
+  author:       "ZJ"
   discord:      ""
   description:  "A 2x2 weight-stationary systolic array for 4-bit matrix multiplication."
   language:     "Verilog"
