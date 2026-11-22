@@ -11,6 +11,8 @@ module systolic_2x2 (
 );
     wire [3:0] a_row0_mid;
     wire [3:0] a_row1_mid;
+    wire [3:0] a_row0_unused;
+    wire [3:0] a_row1_unused;
     wire [7:0] psum_col0_mid;
     wire [7:0] psum_col1_mid;
 
@@ -32,7 +34,7 @@ module systolic_2x2 (
         .load_weight (load_weight),
         .a_in        (a_row0_mid),
         .psum_in     (8'd0),
-        .a_out       (),
+        .a_out       (a_row0_unused),
         .psum_out    (psum_col1_mid)
     );
 
@@ -54,7 +56,9 @@ module systolic_2x2 (
         .load_weight (load_weight),
         .a_in        (a_row1_mid),
         .psum_in     (psum_col1_mid),
-        .a_out       (),
+        .a_out       (a_row1_unused),
         .psum_out    (c_col1_out)
     );
+
+    wire _unused = &{a_row0_unused, a_row1_unused, 1'b0};
 endmodule
