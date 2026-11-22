@@ -1,42 +1,62 @@
 ![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/test/badge.svg) ![](../../workflows/fpga/badge.svg)
 
-# Tiny Tapeout Verilog Project Template
+# 2×2 INT4 Weight-Stationary Systolic Array (Tiny Tapeout)
 
-- [Read the documentation for project](docs/info.md)
+A **2×2 Weight-Stationary Systolic Array** ASIC designed in Verilog for [Tiny Tapeout](https://tinytapeout.com), capable of 4-bit unsigned integer (`INT4`) matrix multiplication (`C = A × W`) with 8-bit accumulation inside a single `1x1` tile.
+
+## Architecture Overview
+
+The array is built from four identical Processing Elements (`simple_pe`) wired into a 2×2 grid (`systolic_2x2`) and wrapped for the Tiny Tapeout harness (`tt_um_systolic_array`):
+
+* **Weight Loading (`uio_in[0] = 1`):** Shifts four 4-bit stationary weights into the grid from the left over 2 clock cycles via `ui_in[3:0]` (Row 0) and `ui_in[7:4]` (Row 1).
+* **Matrix Multiplication (`uio_in[0] = 0`):** Streams skewed 4-bit activations horizontally left-to-right while accumulating 8-bit partial sums vertically top-to-bottom (`psum_out <= psum_in + (a_in * weight)`).
+* **Output Multiplexing (`uio_in[1]`):** Selects whether Column 0 (`0`) or Column 1 (`1`) drives the 8 dedicated output pins (`uo_out[7:0]`).
+
+### Pinout
+
+| Pin | Direction | Function |
+| :--- | :--- | :--- |
+| `ui_in[3:0]` | Input | 4-bit activation / weight input for Row 0 |
+| `ui_in[7:4]` | Input | 4-bit activation / weight input for Row 1 |
+| `uio_in[0]` | Input | `load_weight` (`1` = load weights, `0` = compute) |
+| `uio_in[1]` | Input | `col_select` (`0` = output Col 0, `1` = output Col 1) |
+| `uo_out[7:0]` | Output | 8-bit accumulated result from the selected column |
+
+## Interactive Visualizer
+
+An interactive, cycle-by-cycle visualizer of this 2×2 systolic array is included in the repository:
+* Open [`docs/2x2 Systolic Array Visualisation.html`](docs/2x2%20Systolic%20Array%20Visualisation.html) in any web browser to step through weight loading, skewed activation streaming, and partial-sum accumulation.
+
+## Repository Structure
+
+```text
+├── docs/
+│   ├── info.md                                # Tiny Tapeout project documentation
+│   └── 2x2 Systolic Array Visualisation.html  # Interactive cycle-by-cycle visualizer
+├── src/
+│   ├── project.v                              # Top-level Tiny Tapeout wrapper (tt_um_systolic_array)
+│   ├── systolic_2x2.v                         # 2×2 grid interconnect
+│   └── simple_pe.v                            # Single INT4 weight-stationary Processing Element
+├── test/
+│   ├── Makefile                               # Simulation build rules
+│   ├── tb.v                                   # Verilog testbench wrapper
+│   └── test.py                                # cocotb test suite (basic, max-value 240, back-to-back, randomized)
+└── info.yaml                                  # Tiny Tapeout shuttle configuration
+```
+
+## Running the Simulation
+
+The `cocotb` test suite in `test/test.py` verifies basic matrix multiplication, max-value (`240`) overflow boundaries, back-to-back runs without reset, and 20 randomized 2×2 matrices.
+
+```bash
+cd test
+make
+```
+
+## Documentation
+
+For full cycle-by-cycle testing instructions, see [`docs/info.md`](docs/info.md).
 
 ## What is Tiny Tapeout?
 
-Tiny Tapeout is an educational project that aims to make it easier and cheaper than ever to get your digital and analog designs manufactured on a real chip.
-
-To learn more and get started, visit https://tinytapeout.com.
-
-## Set up your Verilog project
-
-1. Add your Verilog files to the `src` folder.
-2. Edit the [info.yaml](info.yaml) and update information about your project, paying special attention to the `source_files` and `top_module` properties. If you are upgrading an existing Tiny Tapeout project, check out our [online info.yaml migration tool](https://tinytapeout.github.io/tt-yaml-upgrade-tool/).
-3. Edit [docs/info.md](docs/info.md) and add a description of your project.
-4. Adapt the testbench to your design. See [test/README.md](test/README.md) for more information.
-
-The GitHub action will automatically build the ASIC files using [LibreLane](https://www.zerotoasiccourse.com/terminology/librelane/).
-
-## Enable GitHub actions to build the results page
-
-- [Enabling GitHub Pages](https://tinytapeout.com/faq/#my-github-action-is-failing-on-the-pages-part)
-
-## Resources
-
-- [FAQ](https://tinytapeout.com/faq/)
-- [Digital design lessons](https://tinytapeout.com/digital_design/)
-- [Learn how semiconductors work](https://tinytapeout.com/siliwiz/)
-- [Join the community](https://tinytapeout.com/discord)
-- [Build your design locally](https://www.tinytapeout.com/guides/local-hardening/)
-
-## What next?
-
-- [Submit your design to the next shuttle](https://app.tinytapeout.com/).
-- Edit [this README](README.md) and explain your design, how it works, and how to test it.
-- Share your project on your social network of choice:
-  - LinkedIn [#tinytapeout](https://www.linkedin.com/search/results/content/?keywords=%23tinytapeout) [@TinyTapeout](https://www.linkedin.com/company/100708654/)
-  - Mastodon [#tinytapeout](https://chaos.social/tags/tinytapeout) [@matthewvenn](https://chaos.social/@matthewvenn)
-  - X (formerly Twitter) [#tinytapeout](https://twitter.com/hashtag/tinytapeout) [@tinytapeout](https://twitter.com/tinytapeout)
-  - Bluesky [@tinytapeout.com](https://bsky.app/profile/tinytapeout.com)
+Tiny Tapeout is an educational project that aims to make it easier and cheaper than ever to get your digital and analog designs manufactured on a real chip. To learn more, visit [tinytapeout.com](https://tinytapeout.com).
