@@ -25,7 +25,7 @@ The array is built from four identical Processing Elements (`simple_pe`) wired i
 ## Interactive Visualizer
 
 An interactive, cycle-by-cycle visualizer of this 2×2 systolic array is included in the repository:
-* Open [`docs/2x2 Systolic Array Visualisation.html`](docs/2x2%20Systolic%20Array%20Visualisation.html) in any web browser to step through weight loading, skewed activation streaming, and partial-sum accumulation.
+* Open [`docs/visualisation.html`](docs/visualisation.html) in any web browser to step through weight loading, skewed activation streaming, and partial-sum accumulation.
 
 ## Repository Structure
 
