@@ -30,7 +30,11 @@ The array consists of four identical Processing Elements (`simple_pe`) arranged 
 
 To verify the chip, multiply two 2×2 matrices:
 
-$$A = \begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix}, \quad W = \begin{bmatrix} 5 & 6 \\ 7 & 8 \end{bmatrix} \implies C = \begin{bmatrix} 19 & 22 \\ 43 & 50 \end{bmatrix}$$
+```math
+A = \begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix}, \quad
+W = \begin{bmatrix} 5 & 6 \\ 7 & 8 \end{bmatrix} \implies
+C = \begin{bmatrix} 19 & 22 \\ 43 & 50 \end{bmatrix}
+```
 
 1. **Reset:** Pull `rst_n` low (`0`) for 2 clock cycles, then release (`1`).
 2. **Load Weights (`uio_in[0] = 1`):**
